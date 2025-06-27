@@ -1,0 +1,38 @@
+# docker-compose.yml
+
+services:
+  # Definición del servicio RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3.13-management # Usando una versión más específica
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      # Exponemos los puertos al exterior si los necesitas
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} # Se leerá del .env
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS} # Se leerá del .env
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Definición de tu servicio PHP
+  swordPHP:
+    container_name: swordPHP
+    restart: unless-stopped
+    # 'build:' ahora apunta a la carpeta donde está el Dockerfile
+    build:
+      context: ./SwordPHP
+    ports:
+      - "8787:8787"
+    # Le decimos que cargue el .env de su carpeta
+    env_file:
+      - ./SwordPHP/.env
+    # 'depends_on' asegura que RabbitMQ se inicie antes que tu app
+    depends_on:
+      - rabbitmq
+
+# Definimos un volumen para persistir los datos de RabbitMQ
+volumes:
+  rabbitmq_data:
