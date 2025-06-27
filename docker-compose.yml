@@ -1,8 +1,7 @@
 # ===================================================
-# VERSIÓN DEFINITIVA: Con Red Personalizada para Forzar la Solución
+# VERSIÓN DEFINITIVA: Solución para el BUG de Docker v27/v28
 # ===================================================
 services:
-  # --- Servicio de RabbitMQ ---
   rabbitmq:
     image: rabbitmq:3.13-management
     ports:
@@ -13,29 +12,26 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-    networks: # <-- Conecta el servicio a nuestra red personalizada
+    networks:
       - kamples-net
 
-  # --- Servicio de tu Aplicación PHP ---
   swordPHP:
     image: ghcr.io/1ndoryu/kamplesv2:latest
     ports:
       - "8787:8787"
     depends_on:
       - rabbitmq
-    networks: # <-- Conecta el servicio a nuestra red personalizada
+    networks:
       - kamples-net
 
-# --- Definición de Volúmenes ---
 volumes:
   rabbitmq_data:
 
-# --- Definición de la Red Personalizada ---
 networks:
   kamples-net:
     driver: overlay
     ipam:
       driver: default
       config:
-        # --- Esta es la línea más importante del archivo ---
+        # Forzamos un subnet único para evitar el BUG de Docker
         - subnet: 10.88.89.0/24
