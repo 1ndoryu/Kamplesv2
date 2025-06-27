@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     # 'build:' ahora apunta a la carpeta donde está el Dockerfile
     build:
-      context: ./SwordPHP
+      context: ./Sword
     ports:
       - "8787:8787"
     # Le decimos que cargue el .env de su carpeta
