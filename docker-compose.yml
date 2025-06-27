@@ -1,5 +1,5 @@
 # ===================================================
-# VERSIÓN DEFINITIVA: Solución para el BUG de Docker v27/v28
+# Versión Limpia y Final
 # ===================================================
 services:
   rabbitmq:
@@ -10,10 +10,9 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     environment:
+      # Asegúrate que estas variables están en la UI de Dokploy
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - kamples-net
 
   swordPHP:
     image: ghcr.io/1ndoryu/kamplesv2:latest
@@ -21,17 +20,6 @@ services:
       - "8787:8787"
     depends_on:
       - rabbitmq
-    networks:
-      - kamples-net
 
 volumes:
   rabbitmq_data:
-
-networks:
-  kamples-net:
-    driver: overlay
-    ipam:
-      driver: default
-      config:
-        # Forzamos un subnet único para evitar el BUG de Docker
-        - subnet: 10.88.89.0/24
