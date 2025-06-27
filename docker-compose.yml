@@ -1,37 +1,35 @@
-# docker-compose.yml
+# ===================================================
+# Contenido Final y Correcto para docker-compose.yml
+# ===================================================
 
 services:
-  # Definición del servicio RabbitMQ
+  # --- Servicio de RabbitMQ ---
   rabbitmq:
-    image: rabbitmq:3.13-management # Usando una versión más específica
-    container_name: rabbitmq
-    hostname: rabbitmq
-    restart: unless-stopped
+    image: rabbitmq:3.13-management
     ports:
-      # Exponemos los puertos al exterior si los necesitas
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER} # Se leerá del .env
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS} # Se leerá del .env
+      - "15672:15672" # Puerto para la interfaz de gestión web
+      - "5672:5672"   # Puerto para la conexión de clientes (tu app)
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      # Estas variables DEBEN estar definidas en la sección "Environment Variables" de la UI de Dokploy.
+      # Dokploy las inyectará aquí durante el despliegue.
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
 
-  # Definición de tu servicio PHP
+  # --- Servicio de tu Aplicación PHP ---
   swordPHP:
-    container_name: swordPHP
-    restart: unless-stopped
-    # 'build:' ahora apunta a la carpeta donde está el Dockerfile
-    build:
-      context: ./Sword
+    # ESTA ES LA LÍNEA MÁS IMPORTANTE:
+    # Apunta a la imagen que construiste y subiste a GitHub Packages.
+    # Reemplazamos toda la sección 'build' por esta única línea.
+    image: ghcr.io/1ndoryu/kamplesv2:latest
+
     ports:
-      - "8787:8787"
-    # Le decimos que cargue el .env de su carpeta
-
-    # 'depends_on' asegura que RabbitMQ se inicie antes que tu app
+      - "8787:8787" # Puerto que expone tu aplicación PHP
     depends_on:
-      - rabbitmq
+      - rabbitmq # Asegura que RabbitMQ se inicie antes que tu aplicación
 
-# Definimos un volumen para persistir los datos de RabbitMQ
+# --- Definición de Volúmenes ---
+# Esto le dice a Docker que cree un volumen para guardar los datos de RabbitMQ.
 volumes:
   rabbitmq_data:
