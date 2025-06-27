@@ -27,8 +27,7 @@ services:
     ports:
       - "8787:8787"
     # Le decimos que cargue el .env de su carpeta
-    env_file:
-      - ./SwordPHP/.env
+
     # 'depends_on' asegura que RabbitMQ se inicie antes que tu app
     depends_on:
       - rabbitmq
