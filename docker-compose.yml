@@ -1,8 +1,6 @@
 # ===================================================
-# Contenido Final y Correcto para docker-compose.yml
-# (Versión con red personalizada para evitar conflictos)
+# VERSIÓN DEFINITIVA: Con Red Personalizada para Forzar la Solución
 # ===================================================
-
 services:
   # --- Servicio de RabbitMQ ---
   rabbitmq:
@@ -15,7 +13,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
-    networks: # <--- Añadido
+    networks: # <-- Conecta el servicio a nuestra red personalizada
       - kamples-net
 
   # --- Servicio de tu Aplicación PHP ---
@@ -25,7 +23,7 @@ services:
       - "8787:8787"
     depends_on:
       - rabbitmq
-    networks: # <--- Añadido
+    networks: # <-- Conecta el servicio a nuestra red personalizada
       - kamples-net
 
 # --- Definición de Volúmenes ---
@@ -33,10 +31,11 @@ volumes:
   rabbitmq_data:
 
 # --- Definición de la Red Personalizada ---
-networks: # <--- Sección completamente nueva
+networks:
   kamples-net:
     driver: overlay
     ipam:
       driver: default
       config:
+        # --- Esta es la línea más importante del archivo ---
         - subnet: 10.88.89.0/24
